@@ -1,5 +1,6 @@
-﻿using BulkyWeb.Data;
-using BulkyWeb.Models;
+﻿
+using Bulky.DataAccess.Data;
+using Bulky.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -66,7 +67,7 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Edit(Category obj)
         {
-         
+
 
 
             if (ModelState.IsValid)
@@ -108,7 +109,7 @@ namespace BulkyWeb.Controllers
         {
             Category? obj = _db.Categories.Find(id);
 
-            if(obj == null)
+            if (obj == null)
             {
                 return NotFound();
             }
@@ -118,7 +119,7 @@ namespace BulkyWeb.Controllers
             TempData["success"] = "Category deleted successfully";
             return RedirectToAction("Index", "Category");
 
-         
+
         }
     }
 }
