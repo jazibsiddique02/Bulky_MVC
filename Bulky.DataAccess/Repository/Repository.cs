@@ -18,7 +18,7 @@ namespace Bulky.DataAccess.Repository
         {
             _db = db;
             dbSet = _db.Set<T>();
-            
+
         }
         public void Add(T entity)
         {
@@ -32,7 +32,7 @@ namespace Bulky.DataAccess.Repository
             query = query.Where(filter);
             if (!string.IsNullOrEmpty(includeProperies))
             {
-                foreach (var includeProperty in includeProperies.Split(new char[] {','},StringSplitOptions.RemoveEmptyEntries))
+                foreach (var includeProperty in includeProperies.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(includeProperty);
                 }
@@ -43,13 +43,18 @@ namespace Bulky.DataAccess.Repository
         }
 
 
-        public IEnumerable<T> GetAll(string? includeProperies = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperies = null)
         {
             IQueryable<T> query = dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
             if (!string.IsNullOrEmpty(includeProperies))
             {
 
-            foreach(var includeProperty in includeProperies.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)){
+                foreach (var includeProperty in includeProperies.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
                     query = query.Include(includeProperty);
                 }
             }

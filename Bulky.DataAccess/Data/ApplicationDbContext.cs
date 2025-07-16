@@ -18,6 +18,10 @@ namespace Bulky.DataAccess.Data
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
+        public DbSet<Company> Companies { get; set; }
+
+        public DbSet<ShoppingCart> ShoppingCart {  get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +97,36 @@ namespace Bulky.DataAccess.Data
                     Price100 = 10.99,
                     CategoryId = 3,
                     ImageUrl = ""
+                }
+
+                );
+
+
+            // Seed Data for Companies
+
+            modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id= 1,
+                    Name = "David",
+                    StreetAddress = "123 Street,Dallas, Texas",
+                    City = "Dallas",
+                    State = "Texas",
+                    PostalCode="2000",
+                    PhoneNumber="111-222-333"
+
+                },
+
+                new Company
+                {
+                    Id= 2,
+                    Name = "Peter",
+                    StreetAddress = "123 Street,Dallas, Texas",
+                    City = "Dallas",
+                    State = "Texas",
+                    PostalCode = "2000",
+                    PhoneNumber = "111-222-333"
+
                 }
 
                 );

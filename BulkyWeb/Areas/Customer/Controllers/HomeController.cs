@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Bulky.Models;
 using Bulky.DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BulkyWeb.Areas.Customer.Controllers
 {
@@ -25,9 +27,47 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Details(int id)
         {
-            Product product = _unitOfWork.Product.Get(x=>x.Id == id ,includeProperies: "Category");
-            return View(product);
+            ShoppingCart cart = new ()
+            {
+                Product = _unitOfWork.Product.Get(x => x.Id == id, includeProperies: "Category"),
+                ProductId = id,
+                Count = 1
+
+            };
+            
+            return View(cart);
         }
+
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Details(ShoppingCart cart)
+        {
+            // to retrieve id of logged in user
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            cart.ApplicationUserId = userId;
+
+            // if 1 user adds the same product to cart again
+            var cartFromDb = _unitOfWork.ShoppingCart.Get(x => x.ApplicationUserId == userId &&
+            x.ProductId == cart.ProductId);
+            if(cartFromDb != null)
+            {
+                // a single user is trying to add the same product to cart.instead of adding another entry, we will just update the count.
+                cartFromDb.Count = cartFromDb.Count + cart.Count;
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+            }
+            else
+            {
+                // a user is adding a product to cart for the first time
+                _unitOfWork.ShoppingCart.Add(cart);
+            }
+
+            _unitOfWork.Save();
+            TempData["success"] = "Added to Cart Successfully";
+            return RedirectToAction(nameof(Index));
+        }
+
 
         public IActionResult Privacy()
         {

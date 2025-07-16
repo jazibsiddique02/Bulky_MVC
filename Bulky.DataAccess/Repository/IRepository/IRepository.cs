@@ -10,7 +10,7 @@ namespace Bulky.DataAccess.Repository.IRepository
     public interface IRepository<T> where T : class
     {
         // T - Category or any other generic model
-        IEnumerable<T> GetAll(string? includeProperies = null);
+        IEnumerable<T> GetAll(Expression<Func<T,bool>>? filter = null,string? includeProperies = null);
         T Get(Expression<Func<T,bool>> filter, string? includeProperies = null);   // Get using first or default method. example: _db.Categories.FirstOrDefault(x => x.id == id)
 
         void Add(T entity);
