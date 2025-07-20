@@ -110,15 +110,15 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
 
-            public string? Role {  get; set; }
+            public string? Role { get; set; }
 
             [ValidateNever]
-            public IEnumerable<SelectListItem> RoleList {  get; set; }
+            public IEnumerable<SelectListItem> RoleList { get; set; }
 
 
             public string? StreetAddress { get; set; }
-            
-            
+
+
             [Required]
             public string Name { get; set; }
             public string? City { get; set; }
@@ -135,13 +135,7 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!_roleManager.RoleExistsAsync(StaticDetails.Role_Customer).GetAwaiter().GetResult())
-            {
-                _roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Customer)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Employee)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Admin)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Company)).GetAwaiter().GetResult();
-            }
+           
 
 
 
@@ -154,7 +148,7 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     Value = i
 
                 }),
-                CompanyList = _unitOfWork.Company.GetAll().Select(x=> new SelectListItem
+                CompanyList = _unitOfWork.Company.GetAll().Select(x => new SelectListItem
                 {
                     Text = x.Name,
                     Value = x.Id.ToString()
@@ -185,7 +179,7 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                 user.PhoneNumber = Input.PhoneNumber;
                 user.State = Input.State;
 
-                if(Input.Role == StaticDetails.Role_Company)
+                if (Input.Role == StaticDetails.Role_Company)
                 {
                     user.CompanyId = Input.CompanyId;
                 }
@@ -204,7 +198,8 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRoleAsync(user, Input.Role);
                     }
-                    else{
+                    else
+                    {
                         await _userManager.AddToRoleAsync(user, StaticDetails.Role_Customer);
                     }
 
@@ -229,7 +224,15 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        if (User.IsInRole(StaticDetails.Role_Admin))
+                        {
+                            TempData["success"] = "New User Created Successfully";
+                        }
+                        else
+                        {
+
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                        }
                         return LocalRedirect(returnUrl);
                     }
                 }

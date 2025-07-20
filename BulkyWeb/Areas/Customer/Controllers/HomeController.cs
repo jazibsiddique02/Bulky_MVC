@@ -4,6 +4,7 @@ using Bulky.Models;
 using Bulky.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Bulky.Utility;
 
 namespace BulkyWeb.Areas.Customer.Controllers
 {
@@ -21,6 +22,17 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
+            // to retrieve id of logged in user
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+
+            //updating the cart value according to whether the user is logged in or not
+            if(userId != null)
+            {
+                HttpContext.Session.SetInt32(StaticDetails.SessionCart,
+                   _unitOfWork.ShoppingCart.GetAll(x => x.ApplicationUserId == userId.Value).Count());
+            }
             IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperies : "Category");
             return View(productList);
         }
@@ -56,14 +68,20 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 // a single user is trying to add the same product to cart.instead of adding another entry, we will just update the count.
                 cartFromDb.Count = cartFromDb.Count + cart.Count;
                 _unitOfWork.ShoppingCart.Update(cartFromDb);
+                _unitOfWork.Save();
+
             }
             else
             {
                 // a user is adding a product to cart for the first time
                 _unitOfWork.ShoppingCart.Add(cart);
+                _unitOfWork.Save();
+                // we will also update the session cart count using sessions
+                HttpContext.Session.SetInt32(StaticDetails.SessionCart,
+                    _unitOfWork.ShoppingCart.GetAll(x => x.ApplicationUserId == userId).Count());
             }
 
-            _unitOfWork.Save();
+            
             TempData["success"] = "Added to Cart Successfully";
             return RedirectToAction(nameof(Index));
         }
