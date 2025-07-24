@@ -26,6 +26,8 @@ namespace Bulky.DataAccess.Data
 
         public DbSet<OrderDetail> OrderDetails { get; set; }
 
+        public DbSet<ProductImage> ProductImages { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,7 +74,6 @@ namespace Bulky.DataAccess.Data
                     Price50 = 19.99,
                     Price100 = 18.99,
                     CategoryId = 2,
-                    ImageUrl=""
                 },
                 new Product
                 {
@@ -86,7 +87,6 @@ namespace Bulky.DataAccess.Data
                     Price50 = 17.99,
                     Price100 = 16.99,
                     CategoryId = 1,
-                    ImageUrl = ""
                 },
                 new Product
                 {
@@ -100,7 +100,6 @@ namespace Bulky.DataAccess.Data
                     Price50 = 11.99,
                     Price100 = 10.99,
                     CategoryId = 3,
-                    ImageUrl = ""
                 }
 
                 );
